@@ -1,11 +1,10 @@
-import { Suspense, lazy, useEffect, useState } from "react"
+import { lazy, useEffect, useState } from "react"
 import Loader from "./common/Loader";
 import { Route, Routes } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import { Register } from "./pages/auth/Register";
 import ResetPassword from "./pages/auth/ResetPassword";
 import Dashboard from "./pages/dashboard/Index";
-import routes from "./routes";
 
 const DefaultLayout = lazy(() => import('./layouts/DefaultLayout'))
 
@@ -27,17 +26,7 @@ function App() {
 
         <Route element={<DefaultLayout />}>
           <Route index element={<Dashboard />} />
-          {/* {routes.map(({ path, component: Component }) => (
-            <Route
-              path={path}
-              key={path}
-              element={
-                <Suspense fallback={<Loader />}>
-                  <Component />
-                </Suspense>
-              }
-            />
-          ))} */}
+          
         </Route>
 
       </Routes>
