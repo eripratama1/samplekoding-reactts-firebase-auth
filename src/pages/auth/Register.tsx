@@ -9,6 +9,9 @@ import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 export const Register = () => {
 
+  // state name email & password adalah variabel yang digunakan untuk menyimpan data nama user, email & password 
+  // yang diinputkan oleh user.
+  // setName,setEmail, & setPassword fungsisetter yang digunakan untuk nilai dari tiap state variabel yang ada.
   const [name, setName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -16,7 +19,9 @@ export const Register = () => {
   const handleRegisterUser = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    // Memastikan bahwa data nama, email, dan password tidak kosong
     if (!name || !email || !password) {
+      // Menampilkan pesan error menggunakan library toast jika ada data yang kosong
       toast.error('Data masih kosong', {
         style: {
           borderRadius: '10px',
@@ -28,28 +33,41 @@ export const Register = () => {
     }
 
     try {
+      // Membuat pengguna baru menggunakan Firebase createUserWithEmailAndPassword
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
+      // Mendapatkan informasi pengguna saat ini
       const users: any = auth.currentUser
+
+      // Mengirim email verifikasi ke pengguna
       await sendEmailVerification(users)
+
+      // Menampilkan pesan sukses bahwa email verifikasi telah terkirim
       toast.success('Email verifikasi terkirim')
 
+      // Menyiapkan data pengguna untuk disimpan di Firestore
       const docRef = {
         name: name,
         email: email,
         userId: userCredential.user.uid,
         created_at: serverTimestamp()
       }
+
+      // Menyimpan data pengguna ke Firestore
       await setDoc(doc(db, 'users', userCredential.user.uid), docRef)
+
+      // Menampilkan pesan sukses bahwa registrasi berhasil
       toast.success('Registrasi berhasil')
 
     } catch (error: any) {
+      // Menampilkan pesan error jika terjadi kesalahan
       toast.error(error)
     }
   }
+
   return (
     <>
-    <Toaster/>
+      <Toaster />
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
