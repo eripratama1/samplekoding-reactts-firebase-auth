@@ -1,10 +1,54 @@
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import LogoDark from '../../images/logo/logo-dark.svg';
 import Logo from '../../images/logo/logo.svg';
+import { useEffect, useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../hooks/firebase';
 
 const Login = () => {
+
+  const [email, setEmail] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
+
+  useEffect(() => {
+    const checkDataLogin = localStorage.getItem('LOGGED_IN')
+    if (checkDataLogin) {
+      setIsLoggedIn(true)
+    }
+  }, [])
+
+  if (localStorage.getItem('LOGGED_IN')) {
+    return <Navigate to="/" />
+  }
+
+  const handleLoginUser = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!email || !password) {
+      return toast.error('Data login belum lengkap')
+    }
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      const emailVerified = userCredential.user.emailVerified
+
+      if (!emailVerified) {
+        return toast.error('Email belum terverifikasi')
+      } else {
+        const userId = userCredential.user.uid
+        localStorage.setItem('LOGGED_IN', userId)
+        setIsLoggedIn(true)
+      }
+    } catch (error: any) {
+      const errorMessage = error.message
+      toast.error(errorMessage)
+    }
+  }
   return (
     <>
+      <Toaster />
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
@@ -151,7 +195,7 @@ const Login = () => {
                 Sign In to TailAdmin
               </h2>
 
-              <form>
+              <form onSubmit={handleLoginUser}>
                 <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Email
@@ -160,6 +204,8 @@ const Login = () => {
                     <input
                       type="email"
                       placeholder="Enter your email"
+                      onChange={(e) => setEmail(e.target.value)}
+                      value={email}
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
 
@@ -185,12 +231,14 @@ const Login = () => {
 
                 <div className="mb-6">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
-                    Re-type Password
+                    Password
                   </label>
                   <div className="relative">
                     <input
                       type="password"
-                      placeholder="6+ Characters, 1 Capital letter"
+                      placeholder="Enter password"
+                      onChange={(e) => setPassword(e.target.value)}
+                      value={password}
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
 
@@ -272,7 +320,7 @@ const Login = () => {
                   </p>
 
                   <p>
-                    
+
                     <Link to="/reset-password" className="text-primary">
                       Forgot password
                     </Link>
