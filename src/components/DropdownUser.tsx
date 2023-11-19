@@ -1,14 +1,31 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import UserOne from '../images/user/user-01.png';
+import { User } from '../hooks/userData';
 
-const DropdownUser = () => {
+interface DropdownUserProps{
+   // Properti 'dataUser' adalah array dari objek-objek User
+  dataUser:User[]
+
+  // Properti 'setDataUser' adalah fungsi yang menerima satu argumen, yaitu array dari objek-objek User, 
+  setDataUser:(data:User[]) => void
+}
+
+const DropdownUser:React.FC<DropdownUserProps> = (props) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
 
+  /**
+   * baris kode ini dapat diartikan jika props.dataUser[0] adalah truthy atau bernilai true, 
+   * maka UserData akan diisi dengan nilai dari props.dataUser[0]. 
+   * Jika props.dataUser[0] adalah falsy (false) (props.dataUser tidak memiliki elemen / nilai), 
+   * maka UserData akan diisi dengan string kosong ('').
+   */
+  const UserData = props.dataUser[0] || ''
+    
   // close on click outside
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
@@ -45,13 +62,22 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Thomas Anree
+          {/* Mengakses properti name dari objek UserData */}
+            {UserData.name}
           </span>
-          <span className="block text-xs">UX Designer</span>
+          <span className="block text-xs">{UserData.email}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">
-          <img src={UserOne} alt="User" />
+        {/* Jika UserData.image ada dan memiliki nilai truthy (true), maka hasilnya adalah nilai dari UserData.image. 
+            Jik tidak ada  tidak ada atau nilainya falsy (false), maka hasilnya adalah URL avatar dari 
+            https://ui-avatars.com/api/ dengan parameter nama yang diambil dari UserData.name
+        */}
+          <img 
+          src={UserData.image ? UserData.image : `https://ui-avatars.com/api/?name=${UserData.name}`} 
+          alt="User"
+          className='rounded-full'
+          />
         </span>
 
         <svg

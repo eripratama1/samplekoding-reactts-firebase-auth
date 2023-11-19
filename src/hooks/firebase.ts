@@ -33,7 +33,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 // Mendapatkan instansi Firebase Firestore dari aplikasi yang telah diinisialisasi.
-const db = getFirestore(app);
+const db:any = getFirestore(app);
 
 // Mendapatkan instansi Firebase Storage dari aplikasi yang telah diinisialisasi.
 const storage = getStorage(app);

@@ -2,11 +2,44 @@ import { Link } from 'react-router-dom';
 import Logo from '../images/logo/logo-icon.svg';
 import DarkModeSwitcher from './DarkModeSwitcher';
 import DropdownUser from './DropdownUser';
+import { User } from '../hooks/userData';
+import React from 'react';
 
-const Header = (props: {
-  sidebarOpen: string | boolean | undefined;
-  setSidebarOpen: (arg0: boolean) => void;
-}) => {
+/**
+ * interface HeaderProps digunakan untuk mendefinisikan struktur atau bentuk dari properti yang akan diterima
+ * oleh komponen Header
+ */
+interface HeaderProps {
+  /**
+   * Mendeklarasikan properti sidebarOpen yang memiliki tipe data yang bisa menjadi string, boolean, atau undefined.
+   * ini memberikan fleksibilitas dalam hal tipe data yang dapat diterima
+   */
+  sidebarOpen: string | boolean | undefined 
+
+  /**
+   * setSidebarOpen adalah fungsi yang akan menerima satu argumen bertipe boolean dan tidak mengembalikan nilai (void). 
+   * Ini menandakan bahwa properti ini seharusnya adalah sebuah fungsi yang digunakan untuk mengubah nilai dari 
+   * sidebarOpen yang diterima.
+   */
+  setSidebarOpen: (arg0: boolean) => void
+
+  /**
+   * Properti ini mendeklarasikan bahwa properti dataUser akan memiliki tipe data array ([]) yang berisi 
+   * objek-objek yang sesuai dengan tipe data atau interface User. Ini menunjukkan bahwa properti ini 
+   * harus berisi data pengguna(users) dalam bentuk array.
+   */
+  dataUser: User[]
+
+  /**
+   * Properti ini mendeklarasikan setDataUser adalah sebuah fungsi yang diharapkan menerima satu argumen bertipe array 
+   * dari objek-objek yang sesuai dengan tipe data atau interface User, dan tidak mengembalikan nilai (void). 
+   * Ini artinya bahwa properti seharusnya adalah sebuah fungsi yang digunakan untuk mengubah nilai dari dataUser yang 
+   * diterima.
+   */
+  setDataUser: (data: User[]) => void
+}
+
+const Header: React.FC<HeaderProps> = (props) => {
   return (
     <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
       <div className="flex flex-grow items-center justify-between py-4 px-4 shadow-2 md:px-6 2xl:px-11">
@@ -23,31 +56,26 @@ const Header = (props: {
             <span className="relative block h-5.5 w-5.5 cursor-pointer">
               <span className="du-block absolute right-0 h-full w-full">
                 <span
-                  className={`relative top-0 left-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-[0] duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && '!w-full delay-300'
-                  }`}
+                  className={`relative top-0 left-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-[0] duration-200 ease-in-out dark:bg-white ${!props.sidebarOpen && '!w-full delay-300'
+                    }`}
                 ></span>
                 <span
-                  className={`relative top-0 left-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-150 duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && 'delay-400 !w-full'
-                  }`}
+                  className={`relative top-0 left-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-150 duration-200 ease-in-out dark:bg-white ${!props.sidebarOpen && 'delay-400 !w-full'
+                    }`}
                 ></span>
                 <span
-                  className={`relative top-0 left-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-200 duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && '!w-full delay-500'
-                  }`}
+                  className={`relative top-0 left-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-200 duration-200 ease-in-out dark:bg-white ${!props.sidebarOpen && '!w-full delay-500'
+                    }`}
                 ></span>
               </span>
               <span className="absolute right-0 h-full w-full rotate-45">
                 <span
-                  className={`absolute left-2.5 top-0 block h-full w-0.5 rounded-sm bg-black delay-300 duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && '!h-0 !delay-[0]'
-                  }`}
+                  className={`absolute left-2.5 top-0 block h-full w-0.5 rounded-sm bg-black delay-300 duration-200 ease-in-out dark:bg-white ${!props.sidebarOpen && '!h-0 !delay-[0]'
+                    }`}
                 ></span>
                 <span
-                  className={`delay-400 absolute left-0 top-2.5 block h-0.5 w-full rounded-sm bg-black duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && '!h-0 !delay-200'
-                  }`}
+                  className={`delay-400 absolute left-0 top-2.5 block h-0.5 w-full rounded-sm bg-black duration-200 ease-in-out dark:bg-white ${!props.sidebarOpen && '!h-0 !delay-200'
+                    }`}
                 ></span>
               </span>
             </span>
@@ -101,11 +129,12 @@ const Header = (props: {
             <DarkModeSwitcher />
             {/* <!-- Dark Mode Toggler --> */}
 
-           
+
           </ul>
 
           {/* <!-- User Area --> */}
-          <DropdownUser />
+          {/* Passing dua props yaitu dataUser dan setDataUser yang akan digunakan pada komponen DropdownUser */}
+          <DropdownUser dataUser={props.dataUser} setDataUser={props.setDataUser} />
           {/* <!-- User Area --> */}
         </div>
       </div>
