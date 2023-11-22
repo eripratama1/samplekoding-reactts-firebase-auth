@@ -1,18 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-
-import UserOne from '../images/user/user-01.png';
 import { User } from '../hooks/userData';
 
-interface DropdownUserProps{
-   // Properti 'dataUser' adalah array dari objek-objek User
-  dataUser:User[]
+interface DropdownUserProps {
+  // Properti 'dataUser' adalah array dari objek-objek User
+  dataUser: User[]
 
   // Properti 'setDataUser' adalah fungsi yang menerima satu argumen, yaitu array dari objek-objek User, 
-  setDataUser:(data:User[]) => void
+  setDataUser: (data: User[]) => void
+
+  // Properti 'onClick' akan memanggil suatu fungsi yang sudah di definisikan sebelumnya
+  onClick: (e: React.FormEvent) => void
 }
 
-const DropdownUser:React.FC<DropdownUserProps> = (props) => {
+const DropdownUser: React.FC<DropdownUserProps> = (props) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const trigger = useRef<any>(null);
@@ -25,7 +26,7 @@ const DropdownUser:React.FC<DropdownUserProps> = (props) => {
    * maka UserData akan diisi dengan string kosong ('').
    */
   const UserData = props.dataUser[0] || ''
-    
+
   // close on click outside
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
@@ -62,28 +63,27 @@ const DropdownUser:React.FC<DropdownUserProps> = (props) => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-          {/* Mengakses properti name dari objek UserData */}
+            {/* Mengakses properti name dari objek UserData */}
             {UserData.name}
           </span>
           <span className="block text-xs">{UserData.email}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">
-        {/* Jika UserData.image ada dan memiliki nilai truthy (true), maka hasilnya adalah nilai dari UserData.image. 
+          {/* Jika UserData.image ada dan memiliki nilai truthy (true), maka hasilnya adalah nilai dari UserData.image. 
             Jik tidak ada  tidak ada atau nilainya falsy (false), maka hasilnya adalah URL avatar dari 
             https://ui-avatars.com/api/ dengan parameter nama yang diambil dari UserData.name
         */}
-          <img 
-          src={UserData.image ? UserData.image : `https://ui-avatars.com/api/?name=${UserData.name}`} 
-          alt="User"
-          className='rounded-full'
+          <img
+            src={UserData.image ? UserData.image : `https://ui-avatars.com/api/?name=${UserData.name}`}
+            alt="User"
+            className='rounded-full'
           />
         </span>
 
         <svg
-          className={`hidden fill-current sm:block ${
-            dropdownOpen ? 'rotate-180' : ''
-          }`}
+          className={`hidden fill-current sm:block ${dropdownOpen ? 'rotate-180' : ''
+            }`}
           width="12"
           height="8"
           viewBox="0 0 12 8"
@@ -104,9 +104,8 @@ const DropdownUser:React.FC<DropdownUserProps> = (props) => {
         ref={dropdown}
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
-        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark ${
-          dropdownOpen === true ? 'block' : 'hidden'
-        }`}
+        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark ${dropdownOpen === true ? 'block' : 'hidden'
+          }`}
       >
         <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
           <li>
@@ -134,7 +133,7 @@ const DropdownUser:React.FC<DropdownUserProps> = (props) => {
               My Profile
             </Link>
           </li>
-          
+
           <li>
             <Link
               to="/settings"
@@ -161,7 +160,9 @@ const DropdownUser:React.FC<DropdownUserProps> = (props) => {
             </Link>
           </li>
         </ul>
-        <button className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+        <button 
+        onClick={props.onClick}
+        className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
           <svg
             className="fill-current"
             width="22"

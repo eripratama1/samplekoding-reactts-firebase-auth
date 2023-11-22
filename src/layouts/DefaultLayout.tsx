@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { User } from '../hooks/userData';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../hooks/firebase';
@@ -68,6 +68,10 @@ const DefaultLayout: React.FC = () => {
     }
     fetchUser()
   }, [])
+
+  if (!localStorage.getItem('LOGGED_IN')) {
+    return <Navigate to="/auth/login"/>
+  }
 
    return (
     <div className="dark:bg-boxdark-2 dark:text-bodydark">

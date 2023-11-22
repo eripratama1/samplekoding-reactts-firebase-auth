@@ -1,9 +1,11 @@
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import Logo from '../images/logo/logo-icon.svg';
 import DarkModeSwitcher from './DarkModeSwitcher';
 import DropdownUser from './DropdownUser';
 import { User } from '../hooks/userData';
-import React from 'react';
+import React, { useState } from 'react';
+import { signOut } from 'firebase/auth';
+import { auth } from '../hooks/firebase';
 
 /**
  * interface HeaderProps digunakan untuk mendefinisikan struktur atau bentuk dari properti yang akan diterima
@@ -40,6 +42,36 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = (props) => {
+
+  /**
+   * Membuat state isLoggedOut  untuk mengetahui status login/logout user
+   * Sedangkan setIsLoggedOut digunakan untuk mengubah nilai state tersebut
+   */
+  const [isLoggedOut, setIsLoggedOut] = useState<boolean>(false)
+
+  /**
+   * 
+   * Membuat arrorw function logoutUser
+   * dimana kita memanggil fungsi signOut dari firebase beserta objek
+   * autentikasinya (auth) sebagai parameternya
+   * 
+   * lalu mengubah nilai state isLoggedOut menjadi true dan membersihkan 
+   * key LOGGED_IN yang tersimpan di localStorage
+   * 
+   * Kemudian melakukan redirect ke halaman login.
+   */
+  const logoutUser = (e:React.FormEvent) => {
+    e.preventDefault()
+    signOut(auth).then(() => {
+      setIsLoggedOut(true)
+      localStorage.clear()
+    })
+  }
+
+  if (isLoggedOut) {
+    return <Navigate to="/auth/login"/>
+  }
+
   return (
     <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
       <div className="flex flex-grow items-center justify-between py-4 px-4 shadow-2 md:px-6 2xl:px-11">
@@ -133,8 +165,12 @@ const Header: React.FC<HeaderProps> = (props) => {
           </ul>
 
           {/* <!-- User Area --> */}
-          {/* Passing dua props yaitu dataUser dan setDataUser yang akan digunakan pada komponen DropdownUser */}
-          <DropdownUser dataUser={props.dataUser} setDataUser={props.setDataUser} />
+          {/* Passing tiga props yaitu dataUser, setDataUser, onClick yang akan digunakan pada komponen DropdownUser */}
+          <DropdownUser 
+          dataUser={props.dataUser} 
+          setDataUser={props.setDataUser} 
+          onClick={logoutUser}
+          />
           {/* <!-- User Area --> */}
         </div>
       </div>
