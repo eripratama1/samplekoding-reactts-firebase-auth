@@ -1,4 +1,5 @@
 import { lazy } from "react";
+import AccountSetting from "../pages/user/AccountSetting";
 
 const Profile = lazy(() => import('../pages/user/Profile'))
 
@@ -8,6 +9,11 @@ const coreRoutes = [
     title: 'Profile',
     component: Profile
   },
+  {
+    path:'/account-setting',
+    title:'Account Setting',
+    component:AccountSetting
+  }
 
 ];
 
