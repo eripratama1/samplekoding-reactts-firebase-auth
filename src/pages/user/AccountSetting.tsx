@@ -4,7 +4,7 @@ import { User } from "../../hooks/userData"
 import { useNavigate } from "react-router-dom"
 import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore"
 import { auth, db } from "../../hooks/firebase"
-import { sendEmailVerification, signInWithEmailAndPassword, signOut, updateEmail } from "firebase/auth"
+import { sendEmailVerification, signInWithEmailAndPassword, signOut, updateEmail, updatePassword } from "firebase/auth"
 
 const AccountSetting = () => {
 
@@ -13,6 +13,8 @@ const AccountSetting = () => {
     const [currentPassword, setCurrentPassword] = useState<string>('')
     const [email, setEmail] = useState<string>('')
     const [newMail, setNewMail] = useState<string>('')
+
+    const [newPassword, setNewPassword] = useState<string>('')
 
     const navigate: any = useNavigate()
     const userId = localStorage.getItem('LOGGED_IN')
@@ -43,21 +45,22 @@ const AccountSetting = () => {
         }, 3000)
     }
 
+    // Fungsi untuk  update email authentication user
     const updateEmailUser = async (e: React.FormEvent) => {
         e.preventDefault()
 
-          // Melakukan validasi apakah email dan password kosong
+        // Melakukan validasi apakah email dan password kosong
         if (!email && !currentPassword) {
             toast.error("Data tidak boleh kosong")
         }
 
-         // Menyiapkan data yang akan digunakan untuk memperbarui email
+        // Menyiapkan data yang akan digunakan untuk memperbarui email
         const dataUpdateEmail = {
             currentPassword: currentPassword,
             currentEmail: UserData.email,
             newMail: newMail
         }
-        
+
         // Mendapatkan referensi ke dokumen yang ada dalam koleksi "users"
         const colRef = doc(db, "users", UserData.userId)
         const querySnapshot = await getDoc(colRef)
@@ -70,7 +73,7 @@ const AccountSetting = () => {
             // Memperbarui email autentikasi user
             updateEmail(userCredential, dataUpdateEmail.newMail).then(() => {
                 toast.loading("Update email autentikasi", { duration: 3000 })
-                
+
                 if (querySnapshot.exists()) {
                     // Memperbarui dokumen yang ada di dalam collection users
                     updateDoc(doc(db, "users", UserData.userId), {
@@ -83,7 +86,7 @@ const AccountSetting = () => {
                         }).catch((errorSendMail: any) => {
                             toast.error(errorSendMail, { duration: 3000 })
                         })
-                        // Setelah email terkirim jalankan proses logout dan redirect ke halaman login
+                            // Setelah email terkirim jalankan proses logout dan redirect ke halaman login
                             .finally(() => {
                                 signOut(auth).then(() => {
                                     localStorage.clear()
@@ -98,6 +101,45 @@ const AccountSetting = () => {
         })
     }
 
+    // Fungsi untuk update password authentication user
+    const updatePasswordUser = async (e: React.FormEvent) => {
+        e.preventDefault()
+
+        // lakikan proses validasi input
+        if (!newPassword || !currentPassword) {
+            return toast.error('Data tidak boleh kosong')
+        }
+
+        // Membuat object dataUpdatePassword yang berisi nilai dari hasil query ke document yang ada
+        // Pada collection users dan inputan dari user, yang mana object ini kaan digunakan untuk
+        // Proses re-authenticate (login) dan update password
+        const dataUpdatePassword = {
+            currentEmail: UserData.email,
+            currentPassword: currentPassword,
+            newPassword: newPassword
+        }
+
+        // console.log("result datUpdatePassword",dataUpdatePassword);
+
+        // Lakukan proses re-authenticate user
+        await signInWithEmailAndPassword(auth, dataUpdatePassword.currentEmail, dataUpdatePassword.currentPassword).then(() => {
+            const userCredential: any = auth.currentUser
+
+            // Jika proses berhasil lakukan proses update password
+            updatePassword(userCredential, dataUpdatePassword.newPassword).then(() => {
+                toast.success('Password berhasil diperbarui')
+            }).then(() => {
+                // Setelah proses update password berhasil lakukan proses signOut, redirect user ke halaman login
+                // Dan hapus data yang tersimpan pada localStorage
+                signOut(auth).then(() => {
+                    refreshPage()
+                    localStorage.clear()
+                })
+            }).catch((error: any) => {
+                toast.error(error)
+            })
+        })
+    }
 
     return (
         <>
@@ -160,7 +202,7 @@ const AccountSetting = () => {
                                 Update Password
                             </h3>
                         </div>
-                        <form action="#">
+                        <form onSubmit={updatePasswordUser}>
                             <div className="p-6.5">
 
                                 <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -170,6 +212,8 @@ const AccountSetting = () => {
                                         </label>
                                         <input
                                             type="password"
+                                            name={currentPassword}
+                                            onChange={e => setCurrentPassword(e.target.value)}
                                             placeholder="Recent Password"
                                             className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary" />
                                     </div>
@@ -182,6 +226,8 @@ const AccountSetting = () => {
                                         </label>
                                         <input
                                             type="password"
+                                            name={newPassword}
+                                            onChange={e => setNewPassword(e.target.value)}
                                             placeholder="New Password"
                                             className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary" />
                                     </div>
