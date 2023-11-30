@@ -1,10 +1,58 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import LogoDark from '../../images/logo/logo-dark.svg';
 import Logo from '../../images/logo/logo.svg';
+import { useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../../hooks/firebase';
 
 const ResetPassword = () => {
+
+  /**
+   * Mendefinisikan state email dan hook useNavigate dari react router dom
+   */
+  const [email, setEmail] = useState<string>('')
+  const navigate:any = useNavigate()
+
+  /**
+   * Fungsi untuk melakukan redirect ke halaman auth/login
+   */
+  const refreshPage = () => {
+    setTimeout(() => {
+      navigate("/auth/login")
+    },3000)
+  }
+
+  /** Fungsi reset password */
+  const resetPassword = (e:React.FormEvent) => {
+    e.preventDefault()
+
+    /**
+     * Lakukan validasi terlebih dulu sebelum mengirimkan email 
+     * yang berisi link untuk reset password
+     * 
+     */
+    if (!email) {
+      return toast.error("Email belum diisi")
+    }
+
+    /**
+     * Jalankan proses kirim email reset password
+     * tampilkan toast jika proses berhasil maupun gagal
+     * jika proses berhasil lakukan redirect ke halaman login
+     */
+    sendPasswordResetEmail(auth,email).then(() => {
+      refreshPage()
+      toast.success("Email reset password terkirim")
+    }).catch((error:any) => {
+      const errMsg:any = error.message
+      toast.error(errMsg)
+    })
+  }
+
   return (
     <>
+    <Toaster/>
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
@@ -151,7 +199,7 @@ const ResetPassword = () => {
                 Sign In to TailAdmin
               </h2>
 
-              <form>
+              <form onSubmit={resetPassword}>
                 <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Email
@@ -159,6 +207,8 @@ const ResetPassword = () => {
                   <div className="relative">
                     <input
                       type="email"
+                      name={email}
+                      onChange={e => setEmail(e.target.value)}
                       placeholder="Enter your email"
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
