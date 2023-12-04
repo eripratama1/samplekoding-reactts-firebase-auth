@@ -1,10 +1,11 @@
 import { Link, Navigate } from 'react-router-dom';
 import LogoDark from '../../images/logo/logo-dark.svg';
 import Logo from '../../images/logo/logo.svg';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../hooks/firebase';
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { auth, db } from '../../hooks/firebase';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 const Login = () => {
 
@@ -44,6 +45,54 @@ const Login = () => {
     } catch (error: any) {
       const errorMessage = error.message
       toast.error(errorMessage)
+    }
+  }
+
+  const handleLoginGoogle = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    try {
+      /**
+       * Membuat instance dari GoogleAuthProvider yang disediakan oleh firebase auth
+       */
+      const providerGoogle = new GoogleAuthProvider()
+
+      /**
+       * Menampilkan form login google
+       */
+      const result = await signInWithPopup(auth, providerGoogle)
+
+      /**
+       * Mengambil nilai userId dari objek user (result.user)
+       * yang akan kita simpan pada localStorage
+       * dan kita gunakan juag untuk menyimpan data ke cloud firestore.
+       */
+      const userId = result.user.uid
+
+      const docRef = {
+        name: result.user.email,
+        email: result.user.email,
+        userId: userId,
+        providerLogin: "Google",
+        created_at: serverTimestamp()
+      }
+
+      /**
+       * Jalankan proses simpan data ke firestore
+       * dan juga simpan data userId ke localStorage
+       * kemudian redirect ke halaman dashboard
+       */
+      await setDoc(doc(db, "users", userId), docRef)
+      localStorage.setItem("LOGGED_IN", userId)
+      setIsLoggedIn(true)
+
+    } catch (error: any) {
+      /**
+       * Jika terjadi kesalahan tampilkan pesan error
+       * dalam bentuk toast.error
+       */
+      const errorMsg = error.message
+      toast.error(errorMsg)
     }
   }
   return (
@@ -274,7 +323,9 @@ const Login = () => {
                   />
                 </div>
 
-                <button className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
+                <button 
+                onClick={handleLoginGoogle}
+                className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
                   <span>
                     <svg
                       width="20"
