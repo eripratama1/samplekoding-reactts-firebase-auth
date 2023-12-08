@@ -25,7 +25,7 @@ const DefaultLayout: React.FC = () => {
    * Mendeklarasikan state loading yang awalnya diatur ke true, dan setLoading adalah fungsi untuk 
    * memperbarui nilai dari state loading tersebut
    */
-  const [loading, setLoading] = useState<boolean>(true)
+  const [, setLoading] = useState<boolean>(true)
 
   /**
    * Mendeklarasikan state dataUser yang awalnya diatur sebagai array kosong ([]). 

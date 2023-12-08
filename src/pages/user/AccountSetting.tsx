@@ -11,7 +11,7 @@ const AccountSetting = () => {
     // Definisikan beberapa state yang akan digunakan untuk proses update email dan password nantinya
     const [dataUser, setDataUser] = useState<User[]>([])
     const [currentPassword, setCurrentPassword] = useState<string>('')
-    const [email, setEmail] = useState<string>('')
+    const [email, ] = useState<string>('')
     const [newMail, setNewMail] = useState<string>('')
 
     const [newPassword, setNewPassword] = useState<string>('')
@@ -41,7 +41,7 @@ const AccountSetting = () => {
 
     const refreshPage = () => {
         setTimeout(() => {
-            navigate("/auth/login")
+            navigate(0)
         }, 3000)
     }
 
