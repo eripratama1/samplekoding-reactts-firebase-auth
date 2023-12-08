@@ -1,8 +1,0 @@
-## pattern 1
-<IfModule mod_headers.c>
- Options +Indexes
- RewriteEngine On
- RewriteBase /
- RewriteRule ^index\.html$ - [L]
- RewriteRule . /index.html [L]
-</IfModule>
